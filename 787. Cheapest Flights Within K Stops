@@ -1,0 +1,61 @@
+
+class Solution {
+    public int findCheapestPrice(int n, int[][] flights,
+                                 int src, int dst, int k) {
+
+        // Build adjacency list
+        List<int[]>[] adj = new ArrayList[n];
+
+        for (int i = 0; i < n; i++) {
+            adj[i] = new ArrayList<>();
+        }
+
+        for (int[] flight : flights) {
+            int u = flight[0];
+            int v = flight[1];
+            int price = flight[2];
+
+            adj[u].add(new int[]{v, price});
+        }
+
+        // {cost, node, edgesUsed}
+        PriorityQueue<int[]> pq =
+            new PriorityQueue<>((a, b) -> a[0] - b[0]);
+
+        pq.offer(new int[]{0, src, 0});
+
+        // Maximum edges allowed = k + 1
+        while (!pq.isEmpty()) {
+
+            int[] curr = pq.poll();
+
+            int cost = curr[0];
+            int node = curr[1];
+            int edges = curr[2];
+
+            // Destination reached
+            if (node == dst) {
+                return cost;
+            }
+
+            // Cannot use more edges
+            if (edges == k + 1) {
+                continue;
+            }
+
+            for (int[] edge : adj[node]) {
+
+                int next = edge[0];
+                int price = edge[1];
+
+                pq.offer(new int[]{
+                    cost + price,
+                    next,
+                    edges + 1
+                });
+            }
+        }
+
+        return -1;
+    }
+}
